@@ -28,6 +28,7 @@ public class ProductController {
 	@Autowired
 	private ProductService productService;
 
+	// i - Get all products
 	@GetMapping("")
 	public ResponseEntity<List<Product>> get() {
 		List<Product> products = null;
@@ -41,6 +42,7 @@ public class ProductController {
 		return ResponseEntity.ok(products);
 	}
 
+	// Get  product by id
 	@GetMapping("/{id}")
 	public ResponseEntity<Product> get(@PathVariable int id) {
 
@@ -51,14 +53,10 @@ public class ProductController {
 		return ResponseEntity.ok( productService.getProduct(id));	
 	}
 
-	//Feature ii
+	// ii Get filter product by category
 	@GetMapping("/category/{category}")
 	public ResponseEntity<List<String>> getByCategory(@PathVariable String category) {
 		List<String> productsInfo = null;
-
-		if (category == null || category.isBlank()) {
-			ResponseEntity.badRequest().header("Error", "category value is null or empty.").build();
-		}
 
 		productsInfo = productService.getProducts(category);
 
@@ -69,16 +67,22 @@ public class ProductController {
 		return ResponseEntity.ok(productsInfo);
 	}
 
+	// iii Creating new product
 	@PostMapping("")
-	public void create(@RequestBody Product product) {
-		 productService.saveProduct(product);
+	public ResponseEntity<?> create(@RequestBody Product product) {
+		if (product.getId() > 0) {
+			return ResponseEntity.notFound().header("Error", "Product Id has to be empty").build();
+		}
 		
+		productService.saveProduct(product);
+
+		return new ResponseEntity<>(HttpStatus.CREATED);
 	}
 
-	//Feature iv
-	@GetMapping("/avilable/{code}")
+	// iv Product Availability
+	@GetMapping("/available/{code}")
 	public ResponseEntity<String> getExistingProducts(@PathVariable String code) {
-		String product = productService.getExistingProducts(code);
+		String product = productService.getAvailableProducts(code);
 
 		if (product.isEmpty()) {
 			return ResponseEntity.notFound().header("ERROR", "No product exists in inventory").build();
@@ -87,42 +91,38 @@ public class ProductController {
 		return ResponseEntity.ok(product);
 	}
 
+	// v Product cost after tax.
+	@GetMapping("/costaftertax/{category}")
+	public ResponseEntity<List<String>> getProductAfterTax(@PathVariable String category) {
+		List<String> result = productService.getProductAfterTax(category);
+
+		if (result.isEmpty()) {
+			return ResponseEntity.notFound().header("Error", "Product not found").build();
+		}
+
+		return ResponseEntity.ok(result); 
+	}	
+
+	// vi Product discount for most popular product.
 	@GetMapping("/discount")
 	public ResponseEntity<List<String>> getProductDiscount() {
 
 		List<String> result = productService.getProductDiscount();
 
-		if (result  == null) {
+		if (result.isEmpty()) {
 			return ResponseEntity.notFound().header("Error", "Product not found").build();
 		}
 
 		return ResponseEntity.ok(result);
 	}
 
-
-	@GetMapping("/costaftertax/{category}")
-	public ResponseEntity<List<String>> getProductAfterTax(@PathVariable String category) {
-
-		if (category.isBlank()) {
-			return ResponseEntity.badRequest().header("Error", "Value of product code is empty").build();
-		}
-
-		List<String> result = productService.getProductAfterTax(category);
-
-		if (result  == null) {
-			return ResponseEntity.notFound().header("Error", "Product not found").build();
-		}
-
-		return ResponseEntity.ok(result); 
-	}	
-	
+	// vii Update price of product
 	@PutMapping("/id/{id}")
 	public ResponseEntity<?> updateProduct(@PathVariable Integer id, @RequestParam double price){
 		try {
 			Product existProduct = productService.getProduct(id);
 
 			if (existProduct != null) {
-				//existTodo.setId(id);
 				existProduct.setPrice(price);
 
 				productService.saveProduct(existProduct);
@@ -133,12 +133,12 @@ public class ProductController {
 			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 		}
 	}
-	
+
+	// viii Purge product with lowest rating
 	@DeleteMapping("/purgebyrating")
-	public ResponseEntity<?> updateProduct(){
-		
-		productService.purgeProduct();
-		
-		return new ResponseEntity<>(HttpStatus.OK);
+	public ResponseEntity<String> purgeProduct(){	
+		String resultMessage = productService.purgeProduct();
+
+		return ResponseEntity.ok(resultMessage );
 	}
 }
