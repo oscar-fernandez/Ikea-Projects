@@ -1,9 +1,7 @@
 package com.ikea.controller;
 
-import java.net.URI;
 import java.util.List;
 import java.util.NoSuchElementException;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -16,8 +14,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
-
 import com.ikea.model.Product;
 import com.ikea.service.ProductService;
 
@@ -28,7 +24,7 @@ public class ProductController {
 	@Autowired
 	private ProductService productService;
 
-	// i - Get all products
+	// 1 - Get all products
 	@GetMapping("")
 	public ResponseEntity<List<Product>> get() {
 		List<Product> products = null;
@@ -53,7 +49,7 @@ public class ProductController {
 		return ResponseEntity.ok( productService.getProduct(id));	
 	}
 
-	// ii Get filter product by category
+	// 2 Get filter product by category
 	@GetMapping("/category/{category}")
 	public ResponseEntity<List<String>> getByCategory(@PathVariable String category) {
 		List<String> productsInfo = null;
@@ -67,7 +63,7 @@ public class ProductController {
 		return ResponseEntity.ok(productsInfo);
 	}
 
-	// iii Creating new product
+	// 3 Creating new product
 	@PostMapping("")
 	public ResponseEntity<?> create(@RequestBody Product product) {
 		if (product.getId() > 0) {
@@ -79,7 +75,7 @@ public class ProductController {
 		return new ResponseEntity<>(HttpStatus.CREATED);
 	}
 
-	// iv Product Availability
+	// 4 Product Availability
 	@GetMapping("/available/{code}")
 	public ResponseEntity<String> getExistingProducts(@PathVariable String code) {
 		String product = productService.getAvailableProducts(code);
@@ -91,7 +87,7 @@ public class ProductController {
 		return ResponseEntity.ok(product);
 	}
 
-	// v Product cost after tax.
+	// 5 Product cost after tax.
 	@GetMapping("/costaftertax/{category}")
 	public ResponseEntity<List<String>> getProductAfterTax(@PathVariable String category) {
 		List<String> result = productService.getProductAfterTax(category);
@@ -103,7 +99,7 @@ public class ProductController {
 		return ResponseEntity.ok(result); 
 	}	
 
-	// vi Product discount for most popular product.
+	// 6 Product discount for most popular product.
 	@GetMapping("/discount")
 	public ResponseEntity<List<String>> getProductDiscount() {
 
@@ -116,7 +112,7 @@ public class ProductController {
 		return ResponseEntity.ok(result);
 	}
 
-	// vii Update price of product
+	// 7 Update price of product
 	@PutMapping("/id/{id}")
 	public ResponseEntity<?> updateProduct(@PathVariable Integer id, @RequestParam double price){
 		try {
@@ -134,11 +130,11 @@ public class ProductController {
 		}
 	}
 
-	// viii Purge product with lowest rating
+	// 8 Purge product with lowest rating
 	@DeleteMapping("/purgebyrating")
 	public ResponseEntity<String> purgeProduct(){	
 		String resultMessage = productService.purgeProduct();
 
-		return ResponseEntity.ok(resultMessage );
+		return ResponseEntity.ok(resultMessage);
 	}
 }

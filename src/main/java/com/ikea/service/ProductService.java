@@ -17,7 +17,7 @@ public class ProductService {
 	@Autowired
 	ProductRepository prodRep;
 
-	// i - Gets all the inventory products
+	// 1 - Gets all the inventory products
 	public List<Product> getProducts( ) {
 
 		return prodRep.findAll();
@@ -29,7 +29,7 @@ public class ProductService {
 		return prodRep.findById(id).get();
 	}
 
-	// ii Filter Product by given category
+	// 2 - Filter Product by given category
 	public List<String> getProducts( String category) {
 
 		List<Product> products = prodRep.findByCategory(category);
@@ -42,12 +42,12 @@ public class ProductService {
 		return filterProducts;
 	}
 
-	// iii Create and Update product - This method will add product to inventory system
+	// 3 / 7 - Create and Update product - This method will add product to inventory system
 	public void saveProduct(Product newProduct) {
 		prodRep.save(newProduct);
 	}
 
-	// iv Product Availability - Get available products
+	// 4 - Product Availability - Get available products
 	public String getAvailableProducts(String code) {
 		String filterProducts = "";
 
@@ -60,7 +60,7 @@ public class ProductService {
 		return filterProducts;
 	}
 
-	// v - Product Cost - This module will calculate the tax for the given product in inventory and product with tax.
+	// 5 - Product Cost - This module will calculate the tax for the given product in inventory and product with tax.
 	public List<String> getProductAfterTax(String category) {
 		List<String> taxedProducts = new ArrayList<String>();
 
@@ -78,7 +78,7 @@ public class ProductService {
 		return taxedProducts;
 	}
 
-	// vi Product Discount - The method will calculate discount on products and return array of string contain original price and discounted price of products.
+	// 6 - Product Discount - The method will calculate discount on products and return array of string contain original price and discounted price of products.
 	public List<String> getProductDiscount() {
 		List<String> discountedProd = new ArrayList<String>();
 
@@ -96,7 +96,7 @@ public class ProductService {
 	}
 
 
-	// viii - The method will calculate discount on products and return array of string contain original price and discounted price of products.
+	// 8 - The method will calculate discount on products and return array of string contain original price and discounted price of products.
 	public String purgeProduct() {
 		int numOfRecDeleted = prodRep.deleteByRating();
 
